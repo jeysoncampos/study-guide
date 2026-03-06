@@ -4,158 +4,303 @@
 <meta charset="UTF-8">
 <title>Guia de Estudos</title>
 
-<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
 <style>
-body{
-margin:0;
-background:#060810;
-color:white;
-font-family:Arial;
-}
-</style>
 
+body{
+background:#060810;
+font-family:'DM Sans',sans-serif;
+color:#e2e8f0;
+margin:0;
+}
+
+.header{
+padding:20px;
+border-bottom:1px solid #1e293b;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.title{
+font-family:'Syne';
+font-weight:800;
+font-size:22px;
+}
+
+.main{
+display:flex;
+max-width:1100px;
+margin:auto;
+}
+
+.sidebar{
+width:200px;
+border-right:1px solid #1e293b;
+padding:20px;
+}
+
+.subj-btn{
+display:block;
+width:100%;
+margin-bottom:6px;
+padding:10px;
+border-radius:8px;
+border:none;
+background:#0f172a;
+color:white;
+cursor:pointer;
+}
+
+.subj-btn:hover{
+background:#1e293b;
+}
+
+.content{
+flex:1;
+padding:30px;
+}
+
+.hero{
+border-radius:16px;
+padding:20px;
+margin-bottom:20px;
+background:#0f172a;
+border:1px solid #1e293b;
+}
+
+.hero h2{
+font-family:'Syne';
+margin:0;
+}
+
+.tabs{
+display:flex;
+gap:6px;
+margin-bottom:20px;
+}
+
+.tab{
+padding:8px 14px;
+background:#0f172a;
+border-radius:8px;
+cursor:pointer;
+}
+
+.tab.active{
+background:#1e293b;
+}
+
+.unit{
+background:#0f172a;
+border-radius:12px;
+margin-bottom:10px;
+border:1px solid #1e293b;
+}
+
+.unit-header{
+padding:12px;
+cursor:pointer;
+font-weight:600;
+}
+
+.topics{
+padding:10px 20px;
+display:none;
+}
+
+.topic{
+margin-bottom:6px;
+cursor:pointer;
+}
+
+.checked{
+text-decoration:line-through;
+color:#475569;
+}
+
+</style>
 </head>
+
 
 <body>
 
-<div id="root"></div>
+<div class="header">
+<div>
+<div class="title">📚 Guia de Estudos</div>
+<div>1° Semestre · Turno Nocturno</div>
+</div>
+<div id="progress">0%</div>
+</div>
 
-<script type="text/babel">
+<div class="main">
 
-const { useState } = React;
+<div class="sidebar" id="subjects"></div>
 
-const SUBJECTS = [
+<div class="content">
+
+<div class="hero">
+<h2 id="subjName"></h2>
+<p id="subjDesc"></p>
+</div>
+
+<div class="tabs">
+<div class="tab active" onclick="setTab('conteudo')">📚 Conteúdo</div>
+<div class="tab" onclick="setTab('dicas')">💡 Dicas</div>
+<div class="tab" onclick="setTab('recursos')">🔗 Recursos</div>
+</div>
+
+<div id="content"></div>
+
+</div>
+</div>
+
+
+<script>
+
+const subjects = [
 {
-key:"PP",
-emoji:"💻",
 name:"Principios de Programación",
-hours:8,
+desc:"Base de toda programação.",
 units:[
 {
 title:"Introdução à Programação",
 topics:[
-"Algoritmos",
+"O que é algoritmo",
 "Variáveis",
 "Entrada e saída"
 ]
 },
 {
-title:"Estruturas de Controle",
+title:"Loops",
 topics:[
-"if / else",
-"switch",
-"operadores lógicos"
+"while",
+"for",
+"break"
 ]
 }
+],
+tips:[
+"Pratique todos os dias",
+"Não copie código"
+],
+resources:[
+"CS50 Harvard",
+"Exercism"
 ]
 },
+
 {
-key:"MDL1",
-emoji:"🔢",
 name:"Matemática Discreta",
-hours:6,
+desc:"Base matemática da computação.",
 units:[
 {
 title:"Lógica",
 topics:[
-"proposições",
-"tabelas verdade",
-"leis de De Morgan"
+"Proposições",
+"Tabela verdade",
+"Leis de De Morgan"
+]
+}
+],
+tips:[
+"Resolva exercícios",
+"Use diagramas"
+],
+resources:[
+"Brilliant",
+"MIT OCW"
 ]
 }
 ]
+
+let active=0
+let tab="conteudo"
+let checked={}
+
+function renderSubjects(){
+
+let html=""
+
+subjects.forEach((s,i)=>{
+html+=`<button class="subj-btn" onclick="setSubject(${i})">${s.name}</button>`
+})
+
+document.getElementById("subjects").innerHTML=html
 }
-]
 
-function App(){
-
-const [active,setActive]=useState(0)
-const [checked,setChecked]=useState({})
-
-const subj=SUBJECTS[active]
-
-function toggle(key){
-setChecked({...checked,[key]:!checked[key]})
+function setSubject(i){
+active=i
+render()
 }
 
-return(
+function setTab(t){
+tab=t
+render()
+}
 
-<div style={{padding:"40px"}}>
+function toggleTopic(key){
+checked[key]=!checked[key]
+render()
+}
 
-<h1>📚 Guia de Estudos</h1>
+function render(){
 
-<div style={{display:"flex",gap:"20px",marginBottom:"30px"}}>
+const subj=subjects[active]
 
-{SUBJECTS.map((s,i)=>(
+document.getElementById("subjName").innerText=subj.name
+document.getElementById("subjDesc").innerText=subj.desc
 
-<button
-key={i}
-onClick={()=>setActive(i)}
-style={{
-padding:"10px 20px",
-background:i===active?"#2563eb":"#1e293b",
-color:"white",
-border:"none",
-borderRadius:"6px",
-cursor:"pointer"
-}}
->
-{s.emoji} {s.key}
-</button>
+let html=""
 
-))}
+if(tab==="conteudo"){
 
-</div>
+subj.units.forEach((u,ui)=>{
 
-<h2>{subj.name}</h2>
+html+=`<div class="unit">
+<div class="unit-header">${u.title}</div>
+<div class="topics">`
 
-{subj.units.map((unit,ui)=>(
-
-<div key={ui} style={{marginTop:"20px"}}>
-
-<h3>{unit.title}</h3>
-
-{unit.topics.map((topic,ti)=>{
+u.topics.forEach((t,ti)=>{
 
 const key=`${active}-${ui}-${ti}`
 const done=checked[key]
 
-return(
+html+=`<div class="topic ${done?'checked':''}" onclick="toggleTopic('${key}')">
+${t}
+</div>`
 
-<div
-key={ti}
-onClick={()=>toggle(key)}
-style={{
-cursor:"pointer",
-padding:"6px",
-textDecoration:done?"line-through":"none"
-}}
->
+})
 
-<input type="checkbox" checked={done||false} readOnly/>
-{" "}
-{topic}
+html+="</div></div>"
 
-</div>
-
-)
-
-})}
-
-</div>
-
-))}
-
-</div>
-
-)
+})
 
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App/>)
+if(tab==="dicas"){
+
+subj.tips.forEach(t=>{
+html+=`<div class="unit"><div class="unit-header">${t}</div></div>`
+})
+
+}
+
+if(tab==="recursos"){
+
+subj.resources.forEach(r=>{
+html+=`<div class="unit"><div class="unit-header">${r}</div></div>`
+})
+
+}
+
+document.getElementById("content").innerHTML=html
+
+}
+
+renderSubjects()
+render()
 
 </script>
 
