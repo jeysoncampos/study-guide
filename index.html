@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Guia de Estudos</title>
+
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<style>
+body{
+  margin:0;
+  font-family:system-ui;
+  background:#060810;
+  color:white;
+}
+.container{
+  max-width:900px;
+  margin:auto;
+  padding:30px;
+}
+.card{
+  background:#0f172a;
+  border-radius:12px;
+  padding:20px;
+  margin-bottom:16px;
+}
+.topic{
+  padding:10px;
+  border-radius:8px;
+  cursor:pointer;
+}
+.topic:hover{
+  background:#1e293b;
+}
+.checked{
+  text-decoration:line-through;
+  opacity:0.5;
+}
+button{
+  padding:10px 14px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div id="root"></div>
+
+<script type="text/babel">
+
+const SUBJECTS = [
+{
+name:"Principios de Programación",
+units:[
+{
+title:"Introdução à Programação",
+topics:[
+"O que é algoritmo",
+"Variáveis",
+"Entrada e saída de dados"
+]
+},
+{
+title:"Estruturas de Controle",
+topics:[
+"If / Else",
+"Operadores lógicos",
+"Condicionais aninhadas"
+]
+}
+]
+},
+{
+name:"Matemática Discreta",
+units:[
+{
+title:"Lógica Proposicional",
+topics:[
+"Proposições",
+"Tabelas verdade",
+"Leis de De Morgan"
+]
+}
+]
+}
+]
+
+function App(){
+
+const [subject,setSubject]=React.useState(0)
+const [checked,setChecked]=React.useState({})
+
+function toggle(key){
+setChecked(prev=>({
+...prev,
+[key]:!prev[key]
+}))
+}
+
+const subj=SUBJECTS[subject]
+
+return(
+<div className="container">
+
+<h1>📚 Guia de Estudos</h1>
+
+<div style={{marginBottom:20}}>
+{SUBJECTS.map((s,i)=>(
+<button key={i}
+onClick={()=>setSubject(i)}
+style={{marginRight:10}}>
+{s.name}
+</button>
+))}
+</div>
+
+{subj.units.map((unit,ui)=>(
+<div className="card" key={ui}>
+
+<h3>{unit.title}</h3>
+
+{unit.topics.map((t,ti)=>{
+
+const key=`${subject}-${ui}-${ti}`
+const done=checked[key]
+
+return(
+<div
+key={ti}
+className={`topic ${done?"checked":""}`}
+onClick={()=>toggle(key)}
+>
+{done?"✅ ":"⬜ "} {t}
+</div>
+)
+
+})}
+
+</div>
+))}
+
+</div>
+)
+
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>)
+
+</script>
+
+</body>
+</html>
